@@ -22,5 +22,6 @@ export * from "./proposalReject.js";
 export * from "./spendingLimitUse.js";
 export * from "./vaultBatchTransactionAccountClose.js";
 export * from "./vaultTransactionAccountsClose.js";
+export * from "./vaultTransactionMultiUpload.js";
 export * from "./vaultTransactionCreate.js";
 export * from "./vaultTransactionExecute.js";

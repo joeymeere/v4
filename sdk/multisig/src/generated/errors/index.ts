@@ -876,13 +876,36 @@ createErrorFromNameLookup.set(
 )
 
 /**
+ * TransactionTooLarge: 'Transaction is the max size for execution'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class TransactionTooLargeError extends Error {
+  readonly code: number = 0x1796
+  readonly name: string = 'TransactionTooLarge'
+  constructor() {
+    super('Transaction is the max size for execution')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, TransactionTooLargeError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1796, () => new TransactionTooLargeError())
+createErrorFromNameLookup.set(
+  'TransactionTooLarge',
+  () => new TransactionTooLargeError()
+)
+
+/**
  * BatchNotEmpty: 'Batch is not empty'
  *
  * @category Errors
  * @category generated
  */
 export class BatchNotEmptyError extends Error {
-  readonly code: number = 0x1796
+  readonly code: number = 0x1797
   readonly name: string = 'BatchNotEmpty'
   constructor() {
     super('Batch is not empty')
@@ -892,7 +915,7 @@ export class BatchNotEmptyError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1796, () => new BatchNotEmptyError())
+createErrorFromCodeLookup.set(0x1797, () => new BatchNotEmptyError())
 createErrorFromNameLookup.set('BatchNotEmpty', () => new BatchNotEmptyError())
 
 /**
@@ -902,7 +925,7 @@ createErrorFromNameLookup.set('BatchNotEmpty', () => new BatchNotEmptyError())
  * @category generated
  */
 export class SpendingLimitInvalidAmountError extends Error {
-  readonly code: number = 0x1797
+  readonly code: number = 0x1798
   readonly name: string = 'SpendingLimitInvalidAmount'
   constructor() {
     super('Invalid SpendingLimit amount')
@@ -913,7 +936,7 @@ export class SpendingLimitInvalidAmountError extends Error {
 }
 
 createErrorFromCodeLookup.set(
-  0x1797,
+  0x1798,
   () => new SpendingLimitInvalidAmountError()
 )
 createErrorFromNameLookup.set(

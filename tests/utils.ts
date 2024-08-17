@@ -1191,3 +1191,7 @@ export function range(min: number, max: number, step: number = 1) {
 export function comparePubkeys(a: PublicKey, b: PublicKey) {
   return a.toBuffer().compare(b.toBuffer());
 }
+
+export function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}

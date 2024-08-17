@@ -78,6 +78,8 @@ pub enum MultisigError {
     TransactionNotMatchingProposal,
     #[msg("Transaction is not last in batch")]
     TransactionNotLastInBatch,
+    #[msg("Transaction is the max size for execution")]
+    TransactionTooLarge,
     #[msg("Batch is not empty")]
     BatchNotEmpty,
     #[msg("Invalid SpendingLimit amount")]

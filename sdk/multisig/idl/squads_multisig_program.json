@@ -756,6 +756,53 @@
       ]
     },
     {
+      "name": "vaultTransactionMultiUpload",
+      "docs": [
+        "Create a vault transaction in multiple steps."
+      ],
+      "accounts": [
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transaction",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creator",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The member of the multisig that is adding to the transaction."
+          ]
+        },
+        {
+          "name": "rentPayer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The payer for the transaction account rent."
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "VaultTransactionMultiUploadArgs"
+          }
+        }
+      ]
+    },
+    {
       "name": "vaultTransactionExecute",
       "docs": [
         "Execute a vault transaction.",
@@ -2511,6 +2558,53 @@
       }
     },
     {
+      "name": "VaultTransactionMultiUploadArgs",
+      "docs": [
+        "---- Transaction Multi-Uploading ----",
+        "This instruction takes an existing vault transaction, and amends it given the index of the existing transaction,",
+        "additional instructions, and the number of additional ephemeral signers required by the added instructions.",
+        "It's purpose is to circumvent the size limit of a single transaction, by appending additional instructions to an",
+        "existing transaction, ensuring they can still be atomically executed."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "vaultIndex",
+            "docs": [
+              "Index of the vault this transaction belongs to."
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "transactionIndex",
+            "type": "u64"
+          },
+          {
+            "name": "ephemeralSigners",
+            "docs": [
+              "Number of ephemeral signing PDAs required by the transaction."
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "additionalInstructions",
+            "type": {
+              "vec": {
+                "defined": "MultisigCompiledInstruction"
+              }
+            }
+          },
+          {
+            "name": "memo",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "Member",
       "type": {
         "kind": "struct",
@@ -3111,11 +3205,16 @@
     },
     {
       "code": 6038,
+      "name": "TransactionTooLarge",
+      "msg": "Transaction is the max size for execution"
+    },
+    {
+      "code": 6039,
       "name": "BatchNotEmpty",
       "msg": "Batch is not empty"
     },
     {
-      "code": 6039,
+      "code": 6040,
       "name": "SpendingLimitInvalidAmount",
       "msg": "Invalid SpendingLimit amount"
     }

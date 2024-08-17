@@ -16,8 +16,13 @@ import {
   generateMultisigMembers,
   getTestProgramId,
   isCloseToNow,
+  sleep,
   TestMembers,
 } from "../utils";
+import { compileToWrappedMessageV0 } from "@sqds/multisig/lib/utils/compileToWrappedMessageV0";
+import { MultisigCompiledInstruction, multisigCompiledInstructionBeet } from "@sqds/multisig/lib/generated";
+import { compiledMsInstructionBeet } from "@sqds/multisig/lib/types";
+import { BN } from "bn.js";
 
 const { toBigInt } = multisig.utils;
 const { Multisig, VaultTransaction, ConfigTransaction, Proposal } =
@@ -1177,6 +1182,270 @@ describe("Multisig SDK", () => {
           programId,
         })
       )[0];
+    });
+
+    it("error: not a member", async () => {
+      const nonMember = await generateFundedKeypair(connection);
+
+      // Default vault.
+      const [vaultPda] = multisig.getVaultPda({
+        multisigPda,
+        index: 0,
+        programId,
+      });
+
+      // Test transfer instruction.
+      const testPayee = Keypair.generate();
+      const testIx = await createTestTransferInstruction(
+        vaultPda,
+        testPayee.publicKey
+      );
+      const testTransferMessage = new TransactionMessage({
+        payerKey: vaultPda,
+        recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
+        instructions: [testIx],
+      });
+
+      await assert.rejects(
+        () =>
+          multisig.rpc.vaultTransactionCreate({
+            connection,
+            feePayer: nonMember,
+            multisigPda,
+            transactionIndex: 1n,
+            creator: nonMember.publicKey,
+            vaultIndex: 0,
+            ephemeralSigners: 0,
+            transactionMessage: testTransferMessage,
+            programId,
+          }),
+        /Provided pubkey is not a member of multisig/
+      );
+    });
+
+    it("error: unauthorized", async () => {
+      // Default vault.
+      const [vaultPda] = multisig.getVaultPda({
+        multisigPda,
+        index: 0,
+        programId,
+      });
+
+      // Test transfer instruction.
+      const testPayee = Keypair.generate();
+      const testIx = await createTestTransferInstruction(
+        vaultPda,
+        testPayee.publicKey
+      );
+      const testTransferMessage = new TransactionMessage({
+        payerKey: vaultPda,
+        recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
+        instructions: [testIx],
+      });
+
+      await assert.rejects(
+        () =>
+          multisig.rpc.vaultTransactionCreate({
+            connection,
+            feePayer: members.voter,
+            multisigPda,
+            transactionIndex: 1n,
+            creator: members.voter.publicKey,
+            vaultIndex: 0,
+            ephemeralSigners: 0,
+            transactionMessage: testTransferMessage,
+            programId,
+          }),
+        /Attempted to perform an unauthorized action/
+      );
+    });
+
+    it("create a new vault transaction", async () => {
+      const transactionIndex = 1n;
+
+      // Default vault.
+      const [vaultPda, vaultBump] = multisig.getVaultPda({
+        multisigPda,
+        index: 0,
+        programId,
+      });
+
+      // Test transfer instruction (2x)
+      const testPayee = Keypair.generate();
+      const testIx1 = await createTestTransferInstruction(
+        vaultPda,
+        testPayee.publicKey,
+        1 * LAMPORTS_PER_SOL
+      );
+      const testIx2 = await createTestTransferInstruction(
+        vaultPda,
+        testPayee.publicKey,
+        1 * LAMPORTS_PER_SOL
+      );
+      const testTransferMessage = new TransactionMessage({
+        payerKey: vaultPda,
+        recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
+        instructions: [testIx1, testIx2],
+      });
+
+      const signature = await multisig.rpc.vaultTransactionCreate({
+        connection,
+        feePayer: members.proposer,
+        multisigPda,
+        transactionIndex,
+        creator: members.proposer.publicKey,
+        vaultIndex: 0,
+        ephemeralSigners: 0,
+        transactionMessage: testTransferMessage,
+        memo: "Transfer 2 SOL to a test account",
+        programId,
+      });
+      await connection.confirmTransaction(signature);
+
+      const multisigAccount = await Multisig.fromAccountAddress(
+        connection,
+        multisigPda
+      );
+      assert.strictEqual(
+        multisigAccount.transactionIndex.toString(),
+        transactionIndex.toString()
+      );
+
+      const [transactionPda, transactionBump] = multisig.getTransactionPda({
+        multisigPda,
+        index: transactionIndex,
+        programId,
+      });
+      const transactionAccount = await VaultTransaction.fromAccountAddress(
+        connection,
+        transactionPda
+      );
+      assert.strictEqual(
+        transactionAccount.multisig.toBase58(),
+        multisigPda.toBase58()
+      );
+      assert.strictEqual(
+        transactionAccount.creator.toBase58(),
+        members.proposer.publicKey.toBase58()
+      );
+      assert.strictEqual(
+        transactionAccount.index.toString(),
+        transactionIndex.toString()
+      );
+      assert.strictEqual(transactionAccount.vaultBump, vaultBump);
+      assert.deepEqual(
+        transactionAccount.ephemeralSignerBumps,
+        new Uint8Array()
+      );
+      assert.strictEqual(transactionAccount.bump, transactionBump);
+      // TODO: verify the transaction message data.
+      assert.ok(transactionAccount.message);
+    });
+  });
+
+  describe("vault_transaction_multi_upload", () => {
+    let multisigPda: PublicKey;
+
+    before(async () => {
+      const msCreateKey = Keypair.generate();
+
+      // Create new autonomous multisig.
+      multisigPda = (
+        await createAutonomousMultisig({
+          connection,
+          createKey: msCreateKey,
+          members,
+          threshold: 2,
+          timeLock: 0,
+          programId,
+        })
+      )[0];
+    });
+
+    it("create a vault tx, and append a transfer instruction", async () => {
+      const transactionIndex = 1n;
+
+      const [vaultPda, _] = multisig.getVaultPda({
+        multisigPda,
+        index: 0,
+        programId,
+      });
+
+      const testIx = await createTestTransferInstruction(
+        vaultPda,
+        members.proposer.publicKey,
+        1000
+      );
+
+      const message = new TransactionMessage({
+        payerKey: members.proposer.publicKey,
+        recentBlockhash: "",
+        instructions: [testIx],
+      })
+
+      const signature1 = await multisig.rpc.vaultTransactionCreate({
+        connection,
+        feePayer: members.proposer,
+        multisigPda,
+        transactionIndex,
+        creator: members.proposer.publicKey,
+        vaultIndex: 0,
+        ephemeralSigners: 0,
+        transactionMessage: message,
+        memo: "Create a new transfer transaction",
+        programId,
+      });
+      await connection.confirmTransaction(signature1);
+      console.log("Signature 1: ", signature1);
+
+      await sleep(1000);
+
+      const [transaction] = await multisig.getTransactionPda({
+        multisigPda,
+        index: transactionIndex,
+        programId
+      });
+
+      await sleep(1000);
+      
+      // Get the transaction account's info
+      const transactionInfo =
+        await multisig.accounts.VaultTransaction.fromAccountAddress(
+          connection,
+          transaction,
+      )!;
+
+      const instructions = transactionInfo.message.instructions.length;
+      console.log("Instructions: ", instructions);
+      assert.strictEqual(instructions, 1);
+
+      const signature2 = await multisig.rpc.vaultTransactionMultiUpload({
+        connection,
+        feePayer: members.proposer,
+        multisigPda,
+        transactionIndex,
+        creator: members.proposer.publicKey,
+        vaultIndex: 0,
+        ephemeralSigners: 0,
+        additionalInstructions: message,
+        memo: "Append a transfer instruction",
+        programId,
+        sendOptions: { skipPreflight: true },
+      });
+      await connection.confirmTransaction(signature2);
+      console.log("Signature 2: ", signature2);
+
+      await sleep(1000);
+      // Refetch transaction info 
+      const updatedTxInfo =
+        await multisig.accounts.VaultTransaction.fromAccountAddress(
+          connection,
+          transaction,
+      )!;
+
+      const updatedInstructions = updatedTxInfo.message.instructions.length;
+      console.log("Updated Instructions: ", updatedInstructions);
+      assert.strictEqual(updatedInstructions, 2);
     });
 
     it("error: not a member", async () => {

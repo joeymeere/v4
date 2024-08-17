@@ -15,6 +15,7 @@ pub use proposal_vote::*;
 pub use spending_limit_use::*;
 pub use transaction_accounts_close::*;
 pub use vault_transaction_create::*;
+pub use vault_transaction_multi_upload::*;
 pub use vault_transaction_execute::*;
 
 mod batch_add_transaction;
@@ -34,4 +35,5 @@ mod proposal_vote;
 mod spending_limit_use;
 mod transaction_accounts_close;
 mod vault_transaction_create;
+mod vault_transaction_multi_upload;
 mod vault_transaction_execute;

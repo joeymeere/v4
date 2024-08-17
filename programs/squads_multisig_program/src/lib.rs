@@ -175,6 +175,14 @@ pub mod squads_multisig_program {
         VaultTransactionCreate::vault_transaction_create(ctx, args)
     }
 
+    /// Create a vault transaction in multiple steps.
+    pub fn vault_transaction_multi_upload(
+        ctx: Context<VaultTransactionMultiUpload>,
+        args: VaultTransactionMultiUploadArgs,
+    ) -> Result<()> {
+        VaultTransactionMultiUpload::vault_transaction_multi_upload(ctx, args)
+    }
+
     /// Execute a vault transaction.
     /// The transaction must be `Approved`.
     pub fn vault_transaction_execute(ctx: Context<VaultTransactionExecute>) -> Result<()> {
