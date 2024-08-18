@@ -37,7 +37,7 @@ pub struct VaultTransactionMultiUpload<'info> {
 
     #[account( 
         mut,
-        realloc = transaction.try_to_vec()?.len() + args.additional_instructions.len() + 100,
+        realloc = transaction.try_to_vec()?.len() + args.additional_instructions.try_to_vec()?.len() + 150,
         realloc::payer = rent_payer,
         realloc::zero = false,
         seeds = [
