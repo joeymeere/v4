@@ -11,8 +11,9 @@
 <ul>
 <li>Solana Mainnet-beta: <code>SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf</code></li>
 <li>Solana Devnet: <code>SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf</code></li>
+<li>Eclipse Mainnet: <code>eSQDSMLf3qxwHVHeTr9amVAGmZbRLY2rFdSURandt6f</code></li>
 </ul>
-<p>Both deployments can be verified using the <a href="https://github.com/Ellipsis-Labs/solana-verifiable-build">Ellipsis Labs verifiable build</a> tool.</p>
+<p>Solana deployments can be verified using the <a href="https://github.com/Ellipsis-Labs/solana-verifiable-build">Ellipsis Labs verifiable build</a> tool.</p>
 <a id="md:responsibility" class="tsd-anchor"></a><h2><a href="#md:responsibility">Responsibility</a></h2><p>By interacting with this program, users acknowledge and accept full personal responsibility for any consequences, regardless of their nature. This includes both potential risks inherent to the smart contract, also referred to as program, as well as any losses resulting from user errors or misjudgment.</p>
 <p>By using a multisig, it is important to acknowledge certain concepts. Here are some that could be misunderstood by users:</p>
 <ul>
@@ -71,10 +72,15 @@
 <a id="md:security" class="tsd-anchor"></a><h2><a href="#md:security">Security</a></h2><p>Squads Protocol v4 has undergone various independent audits by leading cybersecurity and blockchain smart contract auditing firms.</p>
 <p>Below is a list of audit reports pertaining to the v4 program. Each entry enumerates the responsible auditor and is accompanied by a corresponding GitHub link for review:</p>
 <ul>
-<li>OtterSec: <a href="https://github.com/Squads-Protocol/v4/blob/main/ottersec_squads_v4_audit_final.pdf">View full report</a></li>
-<li>Neodyme: <a href="https://github.com/Squads-Protocol/v4/blob/main/neodyme_squads_v4_report.pdf">View full report</a></li>
+<li>OtterSec: <a href="https://github.com/Squads-Protocol/v4/blob/main/audits/ottersec_squads_v4_audit.pdf">View full report</a></li>
+<li>OtterSec 2024: <a href="https://github.com/Squads-Protocol/v4/blob/main/audits/ottersec_squads_v4_audit_2024.pdf">View full report</a></li>
+<li>Neodyme: <a href="https://github.com/Squads-Protocol/v4/blob/main/audits/neodyme_squads_v4_report.pdf">View full report</a></li>
+<li>Neodyme 2024: <a href="https://github.com/Squads-Protocol/v4/blob/main/audits/neodyme_squads_v4_report_2024.pdf">View full report</a></li>
+<li>Certora + Formal verification: <a href="https://github.com/Squads-Protocol/v4/blob/main/audits/certora_squads_v4_security_report_and_formal_verification.pdf">View full report</a></li>
+<li>Certora Audit + Formal Verification (December 2023): <a href="https://github.com/Squads-Protocol/v4/blob/main/audits/certora_squads_v4_security_report_and_formal_verification_2024.pdf">View full report</a></li>
+<li>Trail of Bits: <a href="https://github.com/Squads-Protocol/v4/blob/main/audits/trail_of_bits_squads_v4_security_audit.pdf">View full report</a></li>
 </ul>
-<a id="md:license" class="tsd-anchor"></a><h2><a href="#md:license">License</a></h2><p>The primary license for Squads Protocol v4 is the Business Source License 1.1 (<code>BUSL-1.1</code>), see <a href="./LICENSE">LICENSE</a>. The following exceptions are not licensed under the BULS-1.1, but are licensed separately as follows:</p>
+<a id="md:license" class="tsd-anchor"></a><h2><a href="#md:license">License</a></h2><p>The primary license for Squads Protocol v4 is the AGPL-3.0 license, see <a href="./LICENSE">LICENSE</a>. The following exceptions are licensed separately as follows:</p>
 <ul>
 <li>The file <a href="https://github.com/Squads-Protocol/v4/blob/main/programs/squads_multisig_program/src/utils/system.rs">https://github.com/Squads-Protocol/v4/blob/main/programs/squads_multisig_program/src/utils/system.rs</a> is derived from code released under the <a href="https://github.com/coral-xyz/anchor/blob/master/LICENSE">Apache 2.0 license</a> at <a href="https://github.com/coral-xyz/anchor/blob/714d5248636493a3d1db1481f16052836ee59e94/lang/syn/src/codegen/accounts/constraints.rs#L1126-L1179">https://github.com/coral-xyz/anchor/blob/714d5248636493a3d1db1481f16052836ee59e94/lang/syn/src/codegen/accounts/constraints.rs#L1126-L1179</a>.</li>
 <li>The file <a href="https://github.com/Squads-Protocol/v4/blob/main/programs/squads_multisig_program/src/utils/small_vec.rs">https://github.com/Squads-Protocol/v4/blob/main/programs/squads_multisig_program/src/utils/small_vec.rs</a> is derived from code released under both the <a href="https://github.com/near/borsh-rs/blob/master/LICENSE-APACHE">Apache 2.0 license</a> and the <a href="https://github.com/near/borsh-rs/blob/master/LICENSE-MIT">MIT license</a> at <a href="https://github.com/near/borsh-rs/blob/master/borsh/src/de/hint.rs">https://github.com/near/borsh-rs/blob/master/borsh/src/de/hint.rs</a> and <a href="https://github.com/near/borsh-rs/blob/master/borsh/src/ser/mod.rs">https://github.com/near/borsh-rs/blob/master/borsh/src/ser/mod.rs</a>.</li>

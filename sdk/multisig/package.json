@@ -21,6 +21,7 @@
     "build:types": "tsc --emitDeclarationOnly",
     "build": "yarn build:js && yarn build:types",
     "generate": "yarn solita",
+    "generate:docs": "typedoc src/index.ts",
     "ts": "tsc --noEmit",
     "prepare:canary": "yarn build && npm version --prerelease --preid=canary"
   },
